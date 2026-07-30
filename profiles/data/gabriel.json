@@ -1,0 +1,10 @@
+{
+    "nombre": "Gabriel",
+    "pais": "Costa Rica",
+    "moneda": "CRC",
+    "idioma": "es",
+    "gustos": [
+        "Marvel Rivals",
+        "Python"
+    ]
+}

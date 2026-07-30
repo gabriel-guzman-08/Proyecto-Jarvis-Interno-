@@ -1,0 +1,55 @@
+{
+    "audífonos": {
+        "audio_device": "Audífono de los auriculares con micrófono (3- CORSAIR VOID ELITE Wireless Gaming Headset)",
+        "children": {
+            "musica": {
+                "apps": [],
+                "urls": [
+                    "https://music.youtube.com/watch?v=9vWNauaZAgg"
+                ]
+            },
+            "music": {
+                "apps": [],
+                "urls": [
+                    "https://music.youtube.com/"
+                ]
+            }
+        }
+    },
+    "barra de sonido": {
+        "audio_device": "Altavoces(High Definition Auto Device)"
+    },
+    "Discord": {
+        "apps": [
+            "\"C:/Users/gabog/AppData/Local/Discord/Update.exe\" --processStart Discord.exe"
+        ],
+        "urls": []
+    },
+    "Chrome": {
+        "children": {
+            "YouTube": {
+                "urls": [
+                    "https://www.youtube.com/"
+                ]
+            },
+            "papá": {
+                "apps": [],
+                "urls": [
+                    "https://music.youtube.com/watch?v=ikFFVfObwss"
+                ]
+            },
+            "music": {
+                "apps": [],
+                "urls": [
+                    "https://music.youtube.com/"
+                ]
+            }
+        }
+    },
+    "Steam": {
+        "apps": [
+            "C:\\Program Files (x86)\\Steam\\steam.exe"
+        ],
+        "children": {}
+    }
+}
