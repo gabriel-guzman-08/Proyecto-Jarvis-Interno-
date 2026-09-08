@@ -1,64 +1,82 @@
-import requests
+import re
+from difflib import SequenceMatcher
 
 
-def interpretar_juego(texto):
+NUMEROS = {
+    "uno": "1", "una": "1",
+    "dos": "2",
+    "tres": "3",
+    "cuatro": "4",
+    "cinco": "5",
+    "seis": "6",
+    "siete": "7",
+    "ocho": "8",
+    "nueve": "9",
+    "diez": "10",
+}
 
-    response = requests.post(
-        "http://localhost:11434/api/chat",
-        json={
-            "model": "llama3.1:8b",
 
-            "messages": [
+def normalizar(s):
+    s = s.lower()
+    for palabra, numero in NUMEROS.items():
+        s = re.sub(rf'\b{palabra}\b', numero, s)
+    s = re.sub(r'[^a-z0-9]', '', s)
+    return s
 
-                {
-                    "role": "system",
-                    "content": """
-Tu tarea es únicamente corregir nombres de videojuegos.
 
-Reglas:
-- Responde SOLO el nombre del juego.
-- NO expliques nada.
-- NO hagas conversación.
-- NO hagas preguntas.
-- NO hables como asistente.
-- SOLO devuelve texto corto.
+def similitud(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
-Ejemplos:
 
-hell drivers 2
-helldivers 2
+def mejor_ventana(texto_norm, nombre_norm):
+    """Busca la sub-cadena dentro de texto_norm más parecida a nombre_norm."""
+    n = len(nombre_norm)
 
-marvel rival
-marvel rivals
+    if n == 0 or len(texto_norm) < 2:
+        return 0.0
 
-call of dute
-call of duty
-"""
-                },
+    mejor_score = 0.0
 
-                {
-                    "role": "user",
-                    "content": texto
-                }
-            ],
+    for tam in range(max(2, n - 2), n + 3):
+        for i in range(0, max(1, len(texto_norm) - tam + 1)):
+            ventana = texto_norm[i:i + tam]
+            score = similitud(ventana, nombre_norm)
+            if score > mejor_score:
+                mejor_score = score
 
-            "stream": False,
+    return mejor_score
 
-            "options": {
-                "temperature": 0.1
-            }
-        }
-    )
 
-    data = response.json()
+def interpretar_juego(texto, games_dict=None):
 
-    respuesta = (
-        data["message"]["content"]
-        .strip()
-        .lower()
-    )
+    texto = texto.lower().strip()
 
-    print("JUEGO INTERPRETADO:",
-          respuesta)
+    if not games_dict:
+        return texto
 
-    return respuesta
+    texto_norm = normalizar(texto)
+
+    mejor_juego = None
+    mejor_score = 0.0
+
+    for nombre in games_dict.keys():
+
+        nombre_norm = normalizar(nombre)
+
+        # coincidencia directa (rápida)
+        if nombre_norm in texto_norm:
+            return nombre
+
+        # coincidencia difusa (tolera errores de Whisper)
+        score = mejor_ventana(texto_norm, nombre_norm)
+
+        if score > mejor_score:
+            mejor_score = score
+            mejor_juego = nombre
+
+    print("MEJOR MATCH:", mejor_juego, "SCORE:", round(mejor_score, 2))
+
+    if mejor_score >= 0.72:
+        return mejor_juego
+
+    return texto

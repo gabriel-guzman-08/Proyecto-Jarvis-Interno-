@@ -1,31 +1,27 @@
-# Virtual environment
-venv/
-.venv/
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# VS Code
-.vscode/
-
-# Logs
-*.log
-
-# Environment variables
+# Secrets
 .env
 
-# Temporary audio
-temp_voice_*.mp3
+# Python
+__pycache__/
+*.py[cod]
 
-# Build
-dist/
-build/
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Temporary audio/files
+temp_voice_*.mp3
+*.tmp
 
 # OS
 Thumbs.db
 .DS_Store
 
-# Piper
-piper/
+# Piper generated/test audio
+piper/*.wav
+piper/*.wav

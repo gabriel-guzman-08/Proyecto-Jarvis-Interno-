@@ -1,7 +1,7 @@
 print("Jarvis iniciado correctamente")
 
 from PySide6.QtCore import QThread, Signal
-from voice.whisper_engine import escuchar_push_to_talk
+from voice.whisper_engine import escuchar_push_to_talk, escuchar_conversacion
 import traceback
 import threading
 import time
@@ -39,8 +39,16 @@ class JarvisWorker(QThread):
                         self.state_changed.emit("listening")
 
                         try:
-                            texto = escuchar_push_to_talk()
+                            from input.keyboard_listener import state as kb_state
 
+                            _inicio_whisper = time.time()
+
+                            if kb_state["conversation_mode"]:
+                                texto = escuchar_conversacion()
+                            else:
+                                texto = escuchar_push_to_talk()
+
+                            print(f"⏱️ WHISPER TARDÓ: {time.time() - _inicio_whisper:.2f} segundos")
                             print("WHISPER:", texto)
 
                             if not texto:
@@ -50,17 +58,18 @@ class JarvisWorker(QThread):
                             texto_lower = texto.lower().strip()
 
                             basura = [
-
                                 "subtítulos realizados por la comunidad de amara.org",
-
                                 "subtítulos por la comunidad de amara.org",
-
                                 "thank you for watching",
-
-                                "gracias por ver el video"
+                                "gracias por ver el video",
+                                "nos vemos en el próximo video",
+                                "hasta la próxima",
+                                "suscríbete",
+                                "suscribete",
+                                "like y suscríbete",
+                                "no olvides suscribirte",
                             ]
-
-                            if texto_lower in basura:
+                            if any(b in texto_lower for b in basura):
 
                                 continue
 
@@ -78,9 +87,16 @@ class JarvisWorker(QThread):
                         self.state_changed.emit("thinking")
 
 
-                        palabras_stop = ["para", "silencio", "cállate", "callate", "detente"]
+                        palabras_stop = ["silencio", "cállate", "callate", "detente", "para de hablar", "para ya"]
 
-                        if any(palabra in texto_lower for palabra in palabras_stop):
+                        palabras_texto = texto_lower.split()
+
+                        if (
+                            any(p in palabras_texto for p in ["silencio", "cállate", "callate", "detente"])
+                            or "para de hablar" in texto_lower
+                            or "para ya" in texto_lower
+                        ):
+                            
                             print("INTERRUPCIÓN DETECTADA")
                             detener_habla()
                             self.state_changed.emit("idle")

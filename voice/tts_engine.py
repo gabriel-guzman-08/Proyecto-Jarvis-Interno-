@@ -2,6 +2,7 @@ import pygame
 import asyncio
 import edge_tts
 import time
+import os
 
 is_speaking = False
 
@@ -63,6 +64,15 @@ def hablar(texto):
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
 
+    # Libera el archivo antes de borrarlo (Windows bloquea
+    # archivos que pygame todavía tiene abiertos)
+    pygame.mixer.music.unload()
+
+    try:
+        os.remove(output_path)
+    except Exception as e:
+        print("No se pudo borrar audio temporal:", e)
+
     is_speaking = False
 
 
@@ -73,6 +83,7 @@ def detener_habla():
     try:
 
         pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
 
         is_speaking = False
 
